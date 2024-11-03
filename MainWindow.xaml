@@ -12,7 +12,7 @@
             <ColumnDefinition Width="200"/>
         </Grid.ColumnDefinitions>
         <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="3" Margin="5">
-            <Canvas x:Name="Canva" Background="White" MouseLeftButtonUp="Canvas_MouseLeftButtonUp"  MouseLeftButtonDown="Canvas_MouseLeftButtonDown" MouseMove="Canvas_MouseMove" MouseRightButtonDown="Canvas_MouseRightButtonDown"/>
+            <Canvas x:Name="MyCanvas" Background="White"/>
         </Border>
         <StackPanel Grid.Column="1">
         </StackPanel>
