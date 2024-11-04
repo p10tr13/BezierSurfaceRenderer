@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography.Pkcs;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,8 @@ namespace GK_Proj_2
         public Point3D[,] controlPoints { get; set; }
 
         public int steps { get; set; }
+
+        public List<Vertex> Grid { get; set; }
 
         public List<Triangle> Triangles { get; set; }
 
@@ -67,12 +70,15 @@ namespace GK_Proj_2
                     }
                 }
             }
+            pu = pu * n;
+            pv = pv * m;
+
             return new Vertex(p,pu,pv);
         }
 
         public List<Triangle> CreateTriangles()
         {
-            List<Vertex> vertices = CreateGrid();
+            Grid = CreateGrid();
             List<Triangle> triangles = new List<Triangle>();
 
             for (int i = 0; i < steps; i++)
@@ -81,16 +87,48 @@ namespace GK_Proj_2
                 {
                     int ind = i * (steps + 1) + j;
                     Vertex v1, v2, v3, v4;
-                    v1 = vertices[ind];
-                    v2 = vertices[ind + 1];
-                    v3 = vertices[ind + steps + 1];
-                    v4 = vertices[ind + steps + 2];
+                    v1 = Grid[ind];
+                    v2 = Grid[ind + 1];
+                    v3 = Grid[ind + steps + 1];
+                    v4 = Grid[ind + steps + 2];
 
                     triangles.Add(new Triangle(v1, v2, v3));
                     triangles.Add(new Triangle(v2, v3, v4));
                 }
             }
             return triangles;
+        }
+
+        public void ChangeSteps(int steps)
+        {
+            this.steps = steps;
+            Triangles = CreateTriangles();
+        }
+
+        public void Rotate(int alpha, int beta)
+        {
+            if (alpha == 0 && beta == 0)
+                return;
+            
+            Matrix3D matrix = MathStatic.GetRotationMatrix(alpha, beta);
+            foreach (Vertex v in Grid)
+            {
+                v.Rotate(matrix);
+            }
+        }
+
+        public Point3D[,] GetRotatedControlPoints(int alpha, int beta)
+        {
+            Point3D[,] result = new Point3D[controlPoints.GetLength(0), controlPoints.GetLength(1)];
+            Matrix3D matrix = MathStatic.GetRotationMatrix(alpha, beta);
+            for (int i = 0; i < controlPoints.GetLength(0); i++)
+            {
+                for (int j = 0; j < controlPoints.GetLength(1); j++)
+                {
+                    result[i,j] = matrix.Transform(controlPoints[i,j]);
+                }
+            }
+            return result;
         }
     }
 }
