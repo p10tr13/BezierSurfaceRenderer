@@ -48,5 +48,29 @@ namespace GK_Proj_2
             PuVecAfter = matrix.Transform(PvVec);
             PvVecAfter = matrix.Transform(PvVec);
         }
+
+        public (int ymin, int ymax, int xmin, double m) GetEdgeAtrib(Vertex vother)
+        {
+            int xmin, ymin, ymax, xmax;
+            double m;
+            if (vother.pointAfter.Y > pointAfter.Y)
+            {
+                ymin = (int)pointAfter.Y;
+                xmin = (int)pointAfter.X;
+                ymax = (int)vother.pointAfter.Y;
+                xmax = (int)vother.pointAfter.X;
+            }
+            else
+            {
+                ymin = (int)vother.pointAfter.Y;
+                xmin = (int)vother.pointAfter.X;
+                ymax = (int)pointAfter.Y;
+                xmax = (int)pointAfter.X;
+            }
+
+            m = ymax == ymin ? 0 : (double)(xmax - xmin) / (double)(ymax - ymin);
+
+            return (ymin, ymax, xmin, m);
+        }
     }
 }

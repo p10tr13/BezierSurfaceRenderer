@@ -4,6 +4,7 @@ using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using Rectangle = System.Windows.Shapes.Rectangle;
@@ -109,7 +110,7 @@ namespace GK_Proj_2
             Draw();
         }
 
-        private void Draw()
+        private void Draw1()
         {
             MyCanvas.Children.Clear();
 
@@ -164,8 +165,8 @@ namespace GK_Proj_2
                     MyCanvas.Children.Add(rect);
                     p++;
                 }
-
-
+                
+                
                 while (e != edgeList.Count && tri.MeanZ <= edgeList[e].MeanZ)
                 {
                     Line line = new Line
@@ -181,11 +182,12 @@ namespace GK_Proj_2
                     e++;
                 }
 
+                tri.Fill(MyCanvas, (int)zoom);
+
                 Polygon polygon = new Polygon()
                 {
                     Stroke = Var.triangleStroke,
-                    StrokeThickness = Var.triangleEdgeWidth,
-                    Fill = Brushes.LightPink
+                    StrokeThickness = Var.triangleEdgeWidth
                 };
                 polygon.Points.Add(new System.Windows.Point(tri.v1.pointAfter.X * zoom, tri.v1.pointAfter.Y * zoom));
                 polygon.Points.Add(new System.Windows.Point(tri.v2.pointAfter.X * zoom, tri.v2.pointAfter.Y * zoom));
@@ -206,7 +208,7 @@ namespace GK_Proj_2
                 MyCanvas.Children.Add(rect);
                 p++;
             }
-
+            
             while (e != edgeList.Count)
             {
                 Line line = new Line
@@ -221,6 +223,33 @@ namespace GK_Proj_2
                 MyCanvas.Children.Add(line);
                 e++;
             }
+        }
+
+        private void Draw()
+        {
+            MyCanvas.Children.Clear();
+
+            if (bezierSurface == null)
+                return;
+
+            double zoom = ZoomSlider.Value;
+
+            int width = (int)MyCanvas.ActualWidth;
+            int height = (int)MyCanvas.ActualHeight;
+            WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
+
+            for (int i = 0; i < bezierSurface.Triangles.Count; i++)
+            {
+                Triangle tri = bezierSurface.Triangles[i];
+
+                tri.Fill1(bitmap, (int)zoom);
+            }
+
+            Image image = new Image { Source = bitmap };
+            Canvas.SetLeft(image, -MyCanvas.ActualWidth / 2);
+            Canvas.SetTop(image, MyCanvas.ActualHeight / 2);
+            image.RenderTransform = new ScaleTransform(1, -1);
+            MyCanvas.Children.Add(image);
         }
 
         private void ChangeLightButton_Click(object sender, RoutedEventArgs e)
@@ -253,19 +282,6 @@ namespace GK_Proj_2
         {
             Var.m = mSlider.Value;
             Draw();
-        }
-    }
-
-    internal record struct NewStruct(int MeanZ, int i1, int j1, int i2, int j2)
-    {
-        public static implicit operator (int MeanZ, int i1, int j1, int i2, int j2)(NewStruct value)
-        {
-            return (value.MeanZ, value.i1, value.j1, value.i2, value.j2);
-        }
-
-        public static implicit operator NewStruct((int MeanZ, int i1, int j1, int i2, int j2) value)
-        {
-            return new NewStruct(value.MeanZ, value.i1, value.j1, value.i2, value.j2);
         }
     }
 }
