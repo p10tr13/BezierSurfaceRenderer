@@ -73,7 +73,7 @@ namespace GK_Proj_2
             pu = pu * n;
             pv = pv * m;
 
-            return new Vertex(p,pu,pv);
+            return new Vertex(p,pu,pv, u, v);
         }
 
         public List<Triangle> CreateTriangles()

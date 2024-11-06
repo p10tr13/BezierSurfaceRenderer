@@ -30,10 +30,10 @@ namespace GK_Proj_2
 
             bool? result = dialog.ShowDialog();
 
-            if (result == true) 
-            { 
+            if (result == true)
+            {
                 string filename = dialog.FileName;
-                Point3D[,] controlPoints = new Point3D[4,4];
+                Point3D[,] controlPoints = new Point3D[4, 4];
                 try
                 {
                     using StreamReader reader = new StreamReader(filename);
@@ -58,7 +58,7 @@ namespace GK_Proj_2
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Wystąpił błąd podczas czytania pliku","Error",MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace GK_Proj_2
 
         private void AlphaSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if(bezierSurface != null)
+            if (bezierSurface != null)
             {
                 bezierSurface.Rotate((int)AlphaSlider.Value, (int)BetaSlider.Value);
                 Draw();
@@ -88,6 +88,7 @@ namespace GK_Proj_2
             if (bezierSurface != null)
             {
                 bezierSurface.Rotate((int)AlphaSlider.Value, (int)BetaSlider.Value);
+                bezierSurface.Triangles = bezierSurface.Triangles.OrderByDescending(tri => tri.MeanZ).ToList();
                 Draw();
             }
         }
@@ -108,120 +109,82 @@ namespace GK_Proj_2
             Draw();
         }
 
-        private void DrawControlPoints()
+        private void Draw()
         {
+            MyCanvas.Children.Clear();
+
             if (bezierSurface == null)
                 return;
+
             double zoom = ZoomSlider.Value;
 
             Point3D[,] points = bezierSurface.GetRotatedControlPoints((int)AlphaSlider.Value, (int)BetaSlider.Value);
-            for (int i = 0; i < points.GetLength(0); i++)
-            {
-                for (int j = 0; j < points.GetLength(1); j++)
-                {
-                    Rectangle rect = new Rectangle
-                    {
-                        Width = 10,
-                        Height = 10,
-                        Fill = Brushes.DarkGreen
-                    };
-                    Canvas.SetLeft(rect, points[i, j].X * zoom - rect.Width / 2);
-                    Canvas.SetTop(rect, points[i, j].Y * zoom - rect.Width / 2);
-                    MyCanvas.Children.Add(rect);
-                }
-            }
 
+            // Stworzenie posortowanej listy punktów kontrolnych
+            List<Point3D> pointList = [.. points];
+            pointList = pointList.OrderByDescending(point => point.Z).ToList();
+            int p = 0;
+
+            // Stworzenie posortowanej listy połączeń pomiędzy punktami kontrolnymi
+            List<(double MeanZ, double x1, double y1, double x2, double y2)> edgeList = [];
             for (int i = 0; i < points.GetLength(0); i++)
             {
                 for (int j = 0; j < points.GetLength(1); j++)
                 {
                     if (j != points.GetLength(1) - 1)
                     {
-                        Line line = new Line
-                        {
-                            X1 = points[i, j].X * zoom,
-                            Y1 = points[i, j].Y * zoom,
-                            X2 = points[i, j + 1].X * zoom,
-                            Y2 = points[i, j + 1].Y * zoom,
-                            Stroke = Brushes.Black,
-                            StrokeThickness = 2
-                        };
-                        MyCanvas.Children.Add(line);
+                        edgeList.Add(((points[i, j].Z + points[i, j + 1].Z) / 2.0, points[i, j].X * zoom, points[i, j].Y * zoom,
+                            points[i, j + 1].X * zoom, points[i, j + 1].Y * zoom));
                     }
 
                     if (i != points.GetLength(0) - 1)
                     {
-                        Line line = new Line
-                        {
-                            X1 = points[i, j].X * zoom,
-                            Y1 = points[i, j].Y * zoom,
-                            X2 = points[i + 1, j].X * zoom,
-                            Y2 = points[i + 1, j].Y * zoom,
-                            Stroke = Brushes.Black,
-                            StrokeThickness = 2
-                        };
-                        MyCanvas.Children.Add(line);
+                        edgeList.Add(((points[i, j].Z + points[i + 1, j].Z) / 2.0, points[i, j].X * zoom, points[i, j].Y * zoom,
+                            points[i + 1, j].X * zoom, points[i + 1, j].Y * zoom));
                     }
                 }
             }
+            edgeList = edgeList.OrderByDescending(edge => edge.MeanZ).ToList();
+            int e = 0;
 
-        }
-
-        private void DrawTriangleGrid()
-        {
-            if (bezierSurface == null)
-                return;
-            double zoom = ZoomSlider.Value;
-
-            foreach (Triangle tri in bezierSurface.Triangles)
+            for (int i = 0; i < bezierSurface.Triangles.Count; i++)
             {
-                Line line1 = new Line
+                Triangle tri = bezierSurface.Triangles[i];
+
+                while (p != pointList.Count && tri.MeanZ <= pointList[p].Z)
                 {
-                    X1 = tri.v1.pointAfter.X * zoom,
-                    Y1 = tri.v1.pointAfter.Y * zoom,
-                    X2 = tri.v2.pointAfter.X * zoom,
-                    Y2 = tri.v2.pointAfter.Y * zoom,
-                    Stroke = Brushes.HotPink,
-                    StrokeThickness = 1
-                };
-                MyCanvas.Children.Add(line1);
+                    Rectangle rect = new Rectangle
+                    {
+                        Width = Var.controlPointRectSize,
+                        Height = Var.controlPointRectSize,
+                        Fill = Brushes.DarkGreen
+                    };
+                    Canvas.SetLeft(rect, pointList[p].X * zoom - rect.Width / 2);
+                    Canvas.SetTop(rect, pointList[p].Y * zoom - rect.Width / 2);
+                    MyCanvas.Children.Add(rect);
+                    p++;
+                }
 
-                Line line2 = new Line
+
+                while (e != edgeList.Count && tri.MeanZ <= edgeList[e].MeanZ)
                 {
-                    X1 = tri.v1.pointAfter.X * zoom,
-                    Y1 = tri.v1.pointAfter.Y * zoom,
-                    X2 = tri.v3.pointAfter.X * zoom,
-                    Y2 = tri.v3.pointAfter.Y * zoom,
-                    Stroke = Brushes.HotPink,
-                    StrokeThickness = 1
-                };
-                MyCanvas.Children.Add(line2);
+                    Line line = new Line
+                    {
+                        X1 = edgeList[e].x1,
+                        Y1 = edgeList[e].y1,
+                        X2 = edgeList[e].x2,
+                        Y2 = edgeList[e].y2,
+                        Stroke = Brushes.Black,
+                        StrokeThickness = Var.controlEdgeWidth
+                    };
+                    MyCanvas.Children.Add(line);
+                    e++;
+                }
 
-                Line line3 = new Line
-                {
-                    X1 = tri.v2.pointAfter.X * zoom,
-                    Y1 = tri.v2.pointAfter.Y * zoom,
-                    X2 = tri.v3.pointAfter.X * zoom,
-                    Y2 = tri.v3.pointAfter.Y * zoom,
-                    Stroke = Brushes.HotPink,
-                    StrokeThickness = 1
-                };
-                MyCanvas.Children.Add(line3);
-            }
-        }
-
-        private void DrawFilledTriangles()
-        {
-            if (bezierSurface == null)
-                return;
-            double zoom = ZoomSlider.Value;
-
-            foreach (Triangle tri in bezierSurface.Triangles)
-            {
                 Polygon polygon = new Polygon()
                 {
-                    Stroke = Brushes.HotPink,
-                    StrokeThickness = 1,
+                    Stroke = Var.triangleStroke,
+                    StrokeThickness = Var.triangleEdgeWidth,
                     Fill = Brushes.LightPink
                 };
                 polygon.Points.Add(new System.Windows.Point(tri.v1.pointAfter.X * zoom, tri.v1.pointAfter.Y * zoom));
@@ -229,19 +192,40 @@ namespace GK_Proj_2
                 polygon.Points.Add(new System.Windows.Point(tri.v3.pointAfter.X * zoom, tri.v3.pointAfter.Y * zoom));
                 MyCanvas.Children.Add(polygon);
             }
-        }
 
-        private void Draw()
-        {
-            MyCanvas.Children.Clear();
-            //DrawTriangleGrid();
-            DrawFilledTriangles();
-            DrawControlPoints();
+            while (p != pointList.Count)
+            {
+                Rectangle rect = new Rectangle
+                {
+                    Width = Var.controlPointRectSize,
+                    Height = Var.controlPointRectSize,
+                    Fill = Brushes.DarkGreen
+                };
+                Canvas.SetLeft(rect, pointList[p].X * zoom - rect.Width / 2);
+                Canvas.SetTop(rect, pointList[p].Y * zoom - rect.Width / 2);
+                MyCanvas.Children.Add(rect);
+                p++;
+            }
+
+            while (e != edgeList.Count)
+            {
+                Line line = new Line
+                {
+                    X1 = edgeList[e].x1,
+                    Y1 = edgeList[e].y1,
+                    X2 = edgeList[e].x2,
+                    Y2 = edgeList[e].y2,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = Var.controlEdgeWidth
+                };
+                MyCanvas.Children.Add(line);
+                e++;
+            }
         }
 
         private void ChangeLightButton_Click(object sender, RoutedEventArgs e)
         {
-            if(int.TryParse(RTextBox.Text,out int r) && int.TryParse(GTextBox.Text, out int g) && int.TryParse(BTextBox.Text, out int b) && 
+            if (int.TryParse(RTextBox.Text, out int r) && int.TryParse(GTextBox.Text, out int g) && int.TryParse(BTextBox.Text, out int b) &&
                 r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255)
             {
                 Var.RLightColor = r;
@@ -269,6 +253,19 @@ namespace GK_Proj_2
         {
             Var.m = mSlider.Value;
             Draw();
+        }
+    }
+
+    internal record struct NewStruct(int MeanZ, int i1, int j1, int i2, int j2)
+    {
+        public static implicit operator (int MeanZ, int i1, int j1, int i2, int j2)(NewStruct value)
+        {
+            return (value.MeanZ, value.i1, value.j1, value.i2, value.j2);
+        }
+
+        public static implicit operator NewStruct((int MeanZ, int i1, int j1, int i2, int j2) value)
+        {
+            return new NewStruct(value.MeanZ, value.i1, value.j1, value.i2, value.j2);
         }
     }
 }
