@@ -110,7 +110,9 @@ namespace GK_Proj_2
             Draw();
         }
 
-        private void Draw1()
+        // Rysowanie siatki z efektem głębi (sortowanie po współrzędnej z podczas obortu beta)
+        // Aby zobaczyć efekt można włączyć proste wypełnianie trójkątów przy rysowaniu Polygon w tej funkcji
+        private void DrawGrid()
         {
             MyCanvas.Children.Clear();
 
@@ -182,8 +184,6 @@ namespace GK_Proj_2
                     e++;
                 }
 
-                tri.Fill(MyCanvas, (int)zoom);
-
                 Polygon polygon = new Polygon()
                 {
                     Stroke = Var.triangleStroke,
@@ -225,7 +225,7 @@ namespace GK_Proj_2
             }
         }
 
-        private void Draw()
+        private void DrawFill()
         {
             MyCanvas.Children.Clear();
 
@@ -242,7 +242,7 @@ namespace GK_Proj_2
             {
                 Triangle tri = bezierSurface.Triangles[i];
 
-                tri.Fill1(bitmap, (int)zoom);
+                tri.Fill(bitmap, (int)zoom);
             }
 
             Image image = new Image { Source = bitmap };
@@ -250,6 +250,13 @@ namespace GK_Proj_2
             Canvas.SetTop(image, MyCanvas.ActualHeight / 2);
             image.RenderTransform = new ScaleTransform(1, -1);
             MyCanvas.Children.Add(image);
+        }
+
+        private void Draw()
+        {
+            if (Var.GridDrawingMode)
+                DrawGrid();
+            else DrawFill();
         }
 
         private void ChangeLightButton_Click(object sender, RoutedEventArgs e)
@@ -281,6 +288,18 @@ namespace GK_Proj_2
         private void mSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             Var.m = mSlider.Value;
+            Draw();
+        }
+
+        private void GridRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            Var.GridDrawingMode = true;
+            Draw();
+        }
+
+        private void FillRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            Var.GridDrawingMode = false;
             Draw();
         }
     }

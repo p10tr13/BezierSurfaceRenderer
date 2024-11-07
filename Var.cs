@@ -11,11 +11,11 @@ namespace GK_Proj_2
 
         public static int BLightColor = 1;
 
-        public static int RectangleRColor = 248;
+        public static byte TriangleRColor = 248;
 
-        public static int RectangleGColor = 24;
+        public static byte TriangleGColor = 24;
 
-        public static int RectangleBColor = 148;
+        public static byte TriangleBColor = 148;
 
         public static double kd = 0.5;
 
@@ -32,5 +32,7 @@ namespace GK_Proj_2
         public static int triangleEdgeWidth = 1;
 
         public static SolidColorBrush triangleStroke = Brushes.HotPink;
+
+        public static bool GridDrawingMode = true;
     }
 }

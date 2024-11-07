@@ -16,7 +16,7 @@ namespace GK_Proj_2
 
         public Vector3D PvVec { get; set; }
 
-        public Vector3D N => Vector3D.CrossProduct(PuVec, PvVec);
+        public Vector3D N => Vector3D.CrossProduct(PuVec, PvVec); // Jeszcze nie znormalizowany
 
         public Point3D pointAfter { get; set; }
 
@@ -24,7 +24,7 @@ namespace GK_Proj_2
 
         public Vector3D PvVecAfter { get; set; }
 
-        public Vector3D NAfter => Vector3D.CrossProduct(PuVecAfter, PvVecAfter);
+        public Vector3D NAfter => Vector3D.CrossProduct(PuVecAfter, PvVecAfter); // Jeszcze nie znormalizowany
 
         public double U { get; set; }
 
@@ -45,7 +45,7 @@ namespace GK_Proj_2
         public void Rotate (Matrix3D matrix)
         {
             pointAfter = matrix.Transform(point);
-            PuVecAfter = matrix.Transform(PvVec);
+            PuVecAfter = matrix.Transform(PuVec);
             PvVecAfter = matrix.Transform(PvVec);
         }
 
