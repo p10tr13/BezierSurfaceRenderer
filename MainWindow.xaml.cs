@@ -92,7 +92,7 @@ namespace GK_Proj_2
             if (bezierSurface != null)
             {
                 bezierSurface.Rotate((int)AlphaSlider.Value, (int)BetaSlider.Value);
-                bezierSurface.Triangles = bezierSurface.Triangles.OrderByDescending(tri => tri.MeanZ).ToList();
+                bezierSurface.Triangles = bezierSurface.Triangles.OrderBy(tri => tri.MeanZ).ToList();
                 Draw();
             }
         }
@@ -128,7 +128,7 @@ namespace GK_Proj_2
 
             // Stworzenie posortowanej listy punktów kontrolnych
             List<Point3D> pointList = [.. points];
-            pointList = pointList.OrderByDescending(point => point.Z).ToList();
+            pointList = pointList.OrderBy(point => point.Z).ToList();
             int p = 0;
 
             // Stworzenie posortowanej listy połączeń pomiędzy punktami kontrolnymi
@@ -150,14 +150,14 @@ namespace GK_Proj_2
                     }
                 }
             }
-            edgeList = edgeList.OrderByDescending(edge => edge.MeanZ).ToList();
+            edgeList = edgeList.OrderBy(edge => edge.MeanZ).ToList();
             int e = 0;
 
             for (int i = 0; i < bezierSurface.Triangles.Count; i++)
             {
                 Triangle tri = bezierSurface.Triangles[i];
 
-                while (p != pointList.Count && tri.MeanZ <= pointList[p].Z)
+                while (p != pointList.Count && tri.MeanZ >= pointList[p].Z)
                 {
                     Rectangle rect = new Rectangle
                     {
@@ -172,7 +172,7 @@ namespace GK_Proj_2
                 }
                 
                 
-                while (e != edgeList.Count && tri.MeanZ <= edgeList[e].MeanZ)
+                while (e != edgeList.Count && tri.MeanZ >= edgeList[e].MeanZ)
                 {
                     Line line = new Line
                     {
