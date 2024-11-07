@@ -36,7 +36,7 @@ namespace GK_Proj_2
             PuVec = puVec;
             PvVec = pvVec;
             pointAfter = new Point3D(point.X, point.Y, point.Z);
-            PuVecAfter = new Vector3D(PuVec.X, PuVec.Y, PvVec.Z);
+            PuVecAfter = new Vector3D(PuVec.X, PuVec.Y, PuVec.Z);
             PvVecAfter = new Vector3D(PvVec.X, PvVec.Y, PvVec.Z);
             this.U = u;
             this.V = v;

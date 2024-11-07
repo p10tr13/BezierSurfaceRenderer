@@ -23,7 +23,7 @@ namespace GK_Proj_2
 
         public static double m = 50;
 
-        public static Point3D SunPosition = new Point3D(0, 1000, 0);
+        public static Point3D SunPosition = new Point3D(0, 0, 500);
 
         public static int controlEdgeWidth = 2;
 
@@ -34,5 +34,13 @@ namespace GK_Proj_2
         public static SolidColorBrush triangleStroke = Brushes.HotPink;
 
         public static bool GridDrawingMode = true;
+
+        public static double SunSpiralRadius = 100.0;
+
+        public static double SunSpiralHeight = 500.0;
+
+        public static double SunSpiralCycleSpeed = 2.0;
+
+        public static double SunAngle = 0;
     }
 }

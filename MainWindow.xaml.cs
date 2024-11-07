@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace GK_Proj_2
@@ -17,6 +18,8 @@ namespace GK_Proj_2
     public partial class MainWindow : Window
     {
         BezierSurface? bezierSurface { get; set; }
+
+        private DispatcherTimer timer;
 
         public MainWindow()
         {
@@ -294,12 +297,59 @@ namespace GK_Proj_2
         private void GridRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             Var.GridDrawingMode = true;
+            if (timer !=  null)
+                timer.Stop();
             Draw();
         }
 
         private void FillRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             Var.GridDrawingMode = false;
+            Draw();
+        }
+
+        private void ChangeObjButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (byte.TryParse(RObjTextBox.Text, out byte r) && byte.TryParse(GObjTextBox.Text, out byte g) && byte.TryParse(BObjTextBox.Text, out byte b) &&
+                r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255)
+            {
+                Var.TriangleRColor = r;
+                Var.TriangleGColor = g;
+                Var.TriangleBColor = b;
+                Draw();
+            }
+            else
+                MessageBox.Show("Złe kolory", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void UpdateSunPosition(object sender, EventArgs e)
+        {
+            Var.SunAngle += Var.SunSpiralCycleSpeed * timer.Interval.TotalSeconds;
+
+            double sunX = Var.SunSpiralRadius * Math.Cos(Var.SunAngle);
+            double sunY = Var.SunSpiralRadius * Math.Sin(Var.SunAngle);
+            Var.SunPosition = new Point3D(sunX, sunY, Var.SunSpiralHeight);
+            Draw();
+        }
+
+        private void StartSunAnimation(object sender, RoutedEventArgs e)
+        {
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(40);
+            timer.Tick += UpdateSunPosition;
+            Var.SunAngle = 0.0;
+            timer.Start();
+        }
+
+        private void StopSunAnimation(object sender, RoutedEventArgs e) 
+        { 
+            if(timer != null)
+                timer.Stop(); 
+        }
+
+        private void zSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            Var.SunSpiralHeight = zSlider.Value;
             Draw();
         }
     }

@@ -160,7 +160,7 @@ namespace GK_Proj_2
             double gl = (double)Var.GLightColor;
             double bl = (double)Var.BLightColor;
 
-            Vector3D V = new Vector3D(0, 0, -1);
+            Vector3D V = new Vector3D(0, 0, 1);
 
             double x1 = v1.pointAfter.X, y1 = v1.pointAfter.Y, z1 = v1.pointAfter.Z;
             double x2 = v2.pointAfter.X, y2 = v2.pointAfter.Y, z2 = v2.pointAfter.Z;

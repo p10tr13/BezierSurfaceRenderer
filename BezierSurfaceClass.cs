@@ -106,10 +106,7 @@ namespace GK_Proj_2
         }
 
         public void Rotate(int alpha, int beta)
-        {
-            if (alpha == 0 && beta == 0)
-                return;
-            
+        {            
             Matrix3D matrix = MathStatic.GetRotationMatrix(alpha, beta);
             foreach (Vertex v in Grid)
             {
