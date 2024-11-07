@@ -15,20 +15,20 @@
             <Canvas x:Name="MyCanvas" Background="White" Loaded="MyCanvas_Loaded"/>
         </Border>
         <StackPanel Grid.Column="1">
-            <Button Content="Wczytaj plik" Click="FileButton_Click" Margin="0,10,0,0"/>
-            <TextBlock Text="Suwak dokładności triangulacji" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <Button Content="Wczytaj plik" Click="FileButton_Click" Margin="0,5,0,0"/>
+            <TextBlock Text="Suwak dokładności triangulacji" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="PrecisionSlider" Value="10" Minimum="5" Maximum="50" SmallChange="1" LargeChange="10" TickFrequency="10" ValueChanged="PrecisionSlider_ValueChanged" Margin="5,5,0,0"/>
-            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                 <RadioButton x:Name="GridRadioButton" Content="Siatka" Margin="5,0,0,0" IsChecked="True" GroupName="GroupA" Checked="GridRadioButton_Checked"/>
                 <RadioButton x:Name="FillRadioButton" Content="Wypełnienie" Margin="20,0,0,0" GroupName="GroupA" Checked="FillRadioButton_Checked"/>
             </StackPanel>
-            <TextBlock Text="Suwak kąta alfa" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Suwak kąta alfa" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="AlphaSlider" Value="0" Minimum="-45" Maximum="45" SmallChange="1" LargeChange="5" TickFrequency="10" ValueChanged="AlphaSlider_ValueChanged" Margin="5,5,0,0"/>
-            <TextBlock Text="Suwak kąta beta" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Suwak kąta beta" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="BetaSlider" Value="0" Minimum="0" Maximum="10" SmallChange="1" LargeChange="2" TickFrequency="5" ValueChanged="BetaSlider_ValueChanged" Margin="5,5,0,0"/>
-            <TextBlock Text="Suwak zoom'a" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Suwak zoom'a" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="ZoomSlider" Value="1" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" TickFrequency="10" ValueChanged="ZoomSlider_ValueChanged" Margin="5,5,0,0"/>
-            <TextBlock Text="Kolor światła" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Kolor światła" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                 <Label>R:</Label>
                 <TextBox x:Name="RTextBox" Width="30" Text="1"/>
@@ -38,7 +38,7 @@
                 <TextBox x:Name="BTextBox" Width="30" Text="1"/>
                 <Button x:Name="ChangeLightButton" Click="ChangeLightButton_Click" Content="Zmień" Margin="5,0,0,0"/>
             </StackPanel>
-            <TextBlock Text="Kolor obiektu" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Kolor obiektu" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                 <Label>R:</Label>
                 <TextBox x:Name="RObjTextBox" Width="30" Text="248"/>
@@ -48,19 +48,24 @@
                 <TextBox x:Name="BObjTextBox" Width="30" Text="148"/>
                 <Button x:Name="ChangeObjButton" Click="ChangeObjButton_Click" Content="Zmień" Margin="5,0,0,0"/>
             </StackPanel>
-            <TextBlock Text="Suwak kd" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Suwak kd" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="kdSlider" Value="0.5" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" ValueChanged="kdSlider_ValueChanged" Margin="5,5,0,0"/>
-            <TextBlock Text="Suwak ks" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Suwak ks" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="ksSlider" Value="0.5" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" ValueChanged="ksSlider_ValueChanged" Margin="5,5,0,0"/>
-            <TextBlock Text="Suwak m" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Text="Suwak m" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="mSlider" Value="50" Minimum="0" Maximum="100" SmallChange="1" LargeChange="10" TickFrequency="10" ValueChanged="mSlider_ValueChanged" Margin="5,5,0,0"/>
             <TextBlock Text="Animacja światła" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
                 <Button Content="Start" Click="StartSunAnimation" Margin="0,0,15,0" Width="70"/>
                 <Button Content="Stop" Click="StopSunAnimation" Margin="15,0,0,0" Width="70"/>
             </StackPanel>
             <TextBlock Text="Suwak z" Margin="0,10,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="zSlider" Value="0" Minimum="-2000" Maximum="2000" SmallChange="10" LargeChange="100" TickFrequency="10" ValueChanged="zSlider_ValueChanged" Margin="5,5,0,0"/>
+            <TextBlock Text="Tekstura" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                <Button Content="Załaduj" Click="TextureButton_Click" Margin="0,0,5,0" Width="50"/>
+                <CheckBox x:Name="TextureCheckBox" Content="Wykorzystanie tekstury" IsChecked="False" Checked="TextureCheckBox_Checked" Unchecked="TextureCheckBox_Unchecked"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

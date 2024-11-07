@@ -352,5 +352,45 @@ namespace GK_Proj_2
             Var.SunSpiralHeight = zSlider.Value;
             Draw();
         }
+
+        private void TextureButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog();
+
+            bool? result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                try
+                {
+                    Var.normalMap = new BitmapImage(new Uri(filename, UriKind.RelativeOrAbsolute));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void TextureCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Var.normalMap != null)
+            {
+                Var.OwnTexture = true;
+                Draw();
+            }
+            else
+            {
+                MessageBox.Show("Brak mapy wektorów normalnych", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                TextureCheckBox.IsChecked = false;
+            }
+        }
+
+        private void TextureCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Var.OwnTexture = false;
+            Draw();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 
 namespace GK_Proj_2
@@ -42,5 +43,9 @@ namespace GK_Proj_2
         public static double SunSpiralCycleSpeed = 2.0;
 
         public static double SunAngle = 0;
+
+        public static bool OwnTexture = false;
+
+        public static BitmapSource? normalMap = null;
     }
 }

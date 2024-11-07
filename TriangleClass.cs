@@ -191,6 +191,45 @@ namespace GK_Proj_2
             Vector3D intN = new Vector3D(nx, ny, nz);
             intN.Normalize();
 
+            if (Var.OwnTexture && Var.normalMap != null)
+            {
+                // Nowe u i v
+                double u = alpha * v1.U + beta * v2.U + gamma * v3.U;
+                double v = alpha * v1.V + beta * v2.V + gamma * v3.V;
+                // Nowe Pu'
+                double pux = alpha * v1.PuVecAfter.X + beta * v2.PuVecAfter.X + gamma * v3.PuVecAfter.X;
+                double puy = alpha * v1.PuVecAfter.Y + beta * v2.PuVecAfter.Y + gamma * v3.PuVecAfter.Y;
+                double puz = alpha * v1.PuVecAfter.Z + beta * v2.PuVecAfter.Z + gamma * v3.PuVecAfter.Z;
+                // Nowe Pv'
+                double pvx = alpha * v1.PvVecAfter.X + beta * v2.PvVecAfter.X + gamma * v3.PvVecAfter.X;
+                double pvy = alpha * v1.PvVecAfter.Y + beta * v2.PvVecAfter.Y + gamma * v3.PvVecAfter.Y;
+                double pvz = alpha * v1.PvVecAfter.Z + beta * v2.PvVecAfter.Z + gamma * v3.PvVecAfter.Z;
+
+                int xp = (int)(u * (Var.normalMap.PixelWidth - 1));
+                int yp = (int)(v * (Var.normalMap.PixelHeight - 1));
+
+                if (xp == Var.normalMap.PixelWidth)
+                    xp -= 1;
+                if (yp == Var.normalMap.PixelHeight)
+                    yp -= 1;
+
+                byte[] pixels = new byte[4];
+                Var.normalMap.CopyPixels(new Int32Rect(xp, yp, 1, 1), pixels, 4, 0);
+                double npx = (pixels[2] / 255.0) * 2 - 1;
+                double npy = (pixels[1] / 255.0) * 2 - 1;
+                double npz = (pixels[0] / 255.0) * 2 - 1;
+
+                Vector3D pixelV = new Vector3D(npx, npy, npz);
+                pixelV.Normalize();
+
+                Matrix3D Matrix = new Matrix3D(pux, pvx, intN.X, 0,
+                                               puy, pvy, intN.Y, 0,
+                                               puz, pvz, intN.Z, 0,
+                                               0, 0, 0, 1);
+                intN = Matrix.Transform(pixelV);
+                intN.Normalize();
+            }
+
             Vector3D reflectionV = 2 * Vector3D.DotProduct(intN, lightV) * intN - lightV;
             reflectionV.Normalize();
 
