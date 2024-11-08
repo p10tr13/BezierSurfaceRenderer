@@ -25,17 +25,17 @@
             <TextBlock Text="Suwak kąta alfa" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="AlphaSlider" Value="0" Minimum="-45" Maximum="45" SmallChange="1" LargeChange="5" TickFrequency="10" ValueChanged="AlphaSlider_ValueChanged" Margin="5,5,0,0"/>
             <TextBlock Text="Suwak kąta beta" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <Slider x:Name="BetaSlider" Value="0" Minimum="0" Maximum="10" SmallChange="1" LargeChange="2" TickFrequency="5" ValueChanged="BetaSlider_ValueChanged" Margin="5,5,0,0"/>
+            <Slider x:Name="BetaSlider" Value="0" Minimum="-45" Maximum="45" SmallChange="1" LargeChange="2" TickFrequency="5" ValueChanged="BetaSlider_ValueChanged" Margin="5,5,0,0"/>
             <TextBlock Text="Suwak zoom'a" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="ZoomSlider" Value="1" Minimum="1" Maximum="100" SmallChange="1" LargeChange="10" TickFrequency="10" ValueChanged="ZoomSlider_ValueChanged" Margin="5,5,0,0"/>
             <TextBlock Text="Kolor światła" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                 <Label>R:</Label>
-                <TextBox x:Name="RTextBox" Width="30" Text="1"/>
+                <TextBox x:Name="RTextBox" Width="30" Text="255"/>
                 <Label>G:</Label>
-                <TextBox x:Name="GTextBox" Width="30" Text="1"/>
+                <TextBox x:Name="GTextBox" Width="30" Text="255"/>
                 <Label>B:</Label>
-                <TextBox x:Name="BTextBox" Width="30" Text="1"/>
+                <TextBox x:Name="BTextBox" Width="30" Text="255"/>
                 <Button x:Name="ChangeLightButton" Click="ChangeLightButton_Click" Content="Zmień" Margin="5,0,0,0"/>
             </StackPanel>
             <TextBlock Text="Kolor obiektu" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -49,7 +49,7 @@
                 <Button x:Name="ChangeObjButton" Click="ChangeObjButton_Click" Content="Zmień" Margin="5,0,0,0"/>
             </StackPanel>
             <TextBlock Text="Suwak kd" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <Slider x:Name="kdSlider" Value="0.5" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" ValueChanged="kdSlider_ValueChanged" Margin="5,5,0,0"/>
+            <Slider x:Name="kdSlider" Value="0.05" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" ValueChanged="kdSlider_ValueChanged" Margin="5,5,0,0"/>
             <TextBlock Text="Suwak ks" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Slider x:Name="ksSlider" Value="0.5" Minimum="0" Maximum="1" SmallChange="0.01" LargeChange="0.1" TickFrequency="0.1" ValueChanged="ksSlider_ValueChanged" Margin="5,5,0,0"/>
             <TextBlock Text="Suwak m" Margin="0,5,0,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>

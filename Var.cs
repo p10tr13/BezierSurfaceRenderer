@@ -6,11 +6,11 @@ namespace GK_Proj_2
 {
     public static class Var
     {
-        public static int RLightColor = 1;
+        public static int RLightColor = 255;
 
-        public static int GLightColor = 1;
+        public static int GLightColor = 255;
 
-        public static int BLightColor = 1;
+        public static int BLightColor = 255;
 
         public static byte TriangleRColor = 248;
 
@@ -36,11 +36,11 @@ namespace GK_Proj_2
 
         public static bool GridDrawingMode = true;
 
-        public static double SunSpiralRadius = 100.0;
+        public static double SunSpiralRadius = 300.0;
 
         public static double SunSpiralHeight = 500.0;
 
-        public static double SunSpiralCycleSpeed = 2.0;
+        public static double SunSpiralCycleSpeed = 4.0;
 
         public static double SunAngle = 0;
 

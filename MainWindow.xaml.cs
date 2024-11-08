@@ -235,8 +235,6 @@ namespace GK_Proj_2
             if (bezierSurface == null)
                 return;
 
-            double zoom = ZoomSlider.Value;
-
             int width = (int)MyCanvas.ActualWidth;
             int height = (int)MyCanvas.ActualHeight;
             WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
@@ -245,7 +243,7 @@ namespace GK_Proj_2
             {
                 Triangle tri = bezierSurface.Triangles[i];
 
-                tri.Fill(bitmap, (int)zoom);
+                tri.Fill(bitmap);
             }
 
             Image image = new Image { Source = bitmap };
