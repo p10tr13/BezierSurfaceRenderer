@@ -24,7 +24,7 @@ namespace GK_Proj_2
 
         public static double m = 50;
 
-        public static Point3D SunPosition = new Point3D(0, 0, 500);
+        public static Point3D SunPosition = new Point3D(350, -210, 200);
 
         public static int controlEdgeWidth = 2;
 
