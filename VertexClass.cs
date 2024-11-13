@@ -46,7 +46,9 @@ namespace GK_Proj_2
         {
             pointAfter = matrix.Transform(point);
             PuVecAfter = matrix.Transform(PuVec);
+            PvVecAfter.Normalize();
             PvVecAfter = matrix.Transform(PvVec);
+            PvVecAfter.Normalize();
         }
 
         public (double ymin, double ymax, double xmin, double m) GetEdgeAtrib(Vertex vother)

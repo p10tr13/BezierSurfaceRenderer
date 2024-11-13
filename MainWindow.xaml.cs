@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.IO;
+﻿using System.IO;
 using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,7 +7,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Drawing;
 using Rectangle = System.Windows.Shapes.Rectangle;
+using System.Drawing.Imaging;
 
 namespace GK_Proj_2
 {
@@ -163,7 +164,7 @@ namespace GK_Proj_2
                     {
                         Width = Var.controlPointRectSize,
                         Height = Var.controlPointRectSize,
-                        Fill = Brushes.DarkGreen
+                        Fill = System.Windows.Media.Brushes.DarkGreen
                     };
                     Canvas.SetLeft(rect, pointList[p].X * zoom - rect.Width / 2);
                     Canvas.SetTop(rect, pointList[p].Y * zoom - rect.Width / 2);
@@ -180,7 +181,7 @@ namespace GK_Proj_2
                         Y1 = edgeList[e].y1,
                         X2 = edgeList[e].x2,
                         Y2 = edgeList[e].y2,
-                        Stroke = Brushes.Black,
+                        Stroke = System.Windows.Media.Brushes.Black,
                         StrokeThickness = Var.controlEdgeWidth
                     };
                     MyCanvas.Children.Add(line);
@@ -204,7 +205,7 @@ namespace GK_Proj_2
                 {
                     Width = Var.controlPointRectSize,
                     Height = Var.controlPointRectSize,
-                    Fill = Brushes.DarkGreen
+                    Fill = System.Windows.Media.Brushes.DarkGreen
                 };
                 Canvas.SetLeft(rect, pointList[p].X * zoom - rect.Width / 2);
                 Canvas.SetTop(rect, pointList[p].Y * zoom - rect.Width / 2);
@@ -220,7 +221,7 @@ namespace GK_Proj_2
                     Y1 = edgeList[e].y1,
                     X2 = edgeList[e].x2,
                     Y2 = edgeList[e].y2,
-                    Stroke = Brushes.Black,
+                    Stroke = System.Windows.Media.Brushes.Black,
                     StrokeThickness = Var.controlEdgeWidth
                 };
                 MyCanvas.Children.Add(line);
@@ -237,20 +238,39 @@ namespace GK_Proj_2
 
             int width = (int)MyCanvas.ActualWidth;
             int height = (int)MyCanvas.ActualHeight;
-            WriteableBitmap bitmap = new WriteableBitmap(width, height, 96, 96, PixelFormats.Bgra32, null);
+            Bitmap bitmap = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(System.Drawing.Color.White);
+            }
 
             for (int i = 0; i < bezierSurface.Triangles.Count; i++)
             {
                 Triangle tri = bezierSurface.Triangles[i];
-
+            
                 tri.Fill(bitmap);
             }
 
-            Image image = new Image { Source = bitmap };
+            //Parallel.ForEach(bezierSurface.Triangles, tri =>
+            //{
+            //    tri.Fill(bitmap);
+            //});
+
+            BitmapSource source = ConvertBitmapToBitmapSource(bitmap);
+            System.Windows.Controls.Image image = new System.Windows.Controls.Image { Source = source, Width = bitmap.Width, Height = bitmap.Height };
             Canvas.SetLeft(image, -MyCanvas.ActualWidth / 2);
             Canvas.SetTop(image, MyCanvas.ActualHeight / 2);
             image.RenderTransform = new ScaleTransform(1, -1);
             MyCanvas.Children.Add(image);
+
+            // Elipsa ukazująca pozycje światła dla sprawdzenia czy ok świeci
+            Ellipse sun = new Ellipse();
+            sun.Stroke = System.Windows.Media.Brushes.Green;
+            sun.Width = 10;
+            sun.Height = 10;
+            Canvas.SetLeft(sun,Var.SunPosition.X - 5);
+            Canvas.SetTop(sun,Var.SunPosition.Y - 5);
+            MyCanvas.Children.Add(sun);
         }
 
         private void Draw()
@@ -332,6 +352,8 @@ namespace GK_Proj_2
 
         private void StartSunAnimation(object sender, RoutedEventArgs e)
         {
+            if (timer != null && timer.IsEnabled)
+                return;
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(40);
             timer.Tick += UpdateSunPosition;
@@ -347,7 +369,67 @@ namespace GK_Proj_2
 
         private void zSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (timer == null || !timer.IsEnabled)
+            {
+                Var.SunPosition.Z = (double)zSlider.Value;
+                Draw();
+                return;
+            }
             Var.SunSpiralHeight = zSlider.Value;
+            Draw();
+        }
+
+        private void NormalsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog();
+
+            bool? result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                try
+                {
+                    Var.normalMap = new BitmapImage(new Uri(filename, UriKind.RelativeOrAbsolute));
+
+                    Var.normalMapTable = new byte[Var.normalMap.PixelWidth, Var.normalMap.PixelHeight, 3];
+
+                    for (int i = 0; i < Var.normalMap.PixelWidth; i++)
+                    {
+                        for (int j = 0; j < Var.normalMap.PixelHeight; j++)
+                        {
+                            byte[] pixels = new byte[4];
+                            Var.normalMap.CopyPixels(new Int32Rect(i, j, 1, 1), pixels, 4, 0);
+                            Var.normalMapTable[i, j, 0] = pixels[0];
+                            Var.normalMapTable[i, j, 1] = pixels[1];
+                            Var.normalMapTable[i, j, 2] = pixels[2];
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void NormalsCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Var.normalMap != null)
+            {
+                Var.OwnNormals = true;
+                Draw();
+            }
+            else
+            {
+                MessageBox.Show("Brak mapy wektorów normalnych", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                TextureCheckBox.IsChecked = false;
+            }
+        }
+
+        private void NormalsCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Var.OwnNormals = false;
             Draw();
         }
 
@@ -362,7 +444,21 @@ namespace GK_Proj_2
                 string filename = dialog.FileName;
                 try
                 {
-                    Var.normalMap = new BitmapImage(new Uri(filename, UriKind.RelativeOrAbsolute));
+                    Var.textureMap = new BitmapImage(new Uri(filename, UriKind.RelativeOrAbsolute));
+
+                    Var.textureMapTable = new byte[Var.textureMap.PixelWidth, Var.textureMap.PixelHeight, 3];
+
+                    for (int i = 0; i < Var.textureMap.PixelWidth; i++)
+                    {
+                        for (int j = 0; j < Var.textureMap.PixelHeight; j++)
+                        {
+                            byte[] pixels = new byte[4];
+                            Var.textureMap.CopyPixels(new Int32Rect(i, j, 1, 1), pixels, 4, 0);
+                            Var.textureMapTable[i, j, 0] = pixels[0];
+                            Var.textureMapTable[i, j, 1] = pixels[1];
+                            Var.textureMapTable[i, j, 2] = pixels[2];
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -373,7 +469,7 @@ namespace GK_Proj_2
 
         private void TextureCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            if (Var.normalMap != null)
+            if (Var.textureMap != null)
             {
                 Var.OwnTexture = true;
                 Draw();
@@ -389,6 +485,23 @@ namespace GK_Proj_2
         {
             Var.OwnTexture = false;
             Draw();
+        }
+
+        public BitmapSource ConvertBitmapToBitmapSource(Bitmap bitmap)
+        {
+            using (MemoryStream memory = new MemoryStream())
+            {
+                bitmap.Save(memory, ImageFormat.Bmp);
+                memory.Position = 0;
+
+                BitmapImage bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.StreamSource = memory;
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.EndInit();
+
+                return bitmapImage;
+            }
         }
     }
 }

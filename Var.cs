@@ -24,7 +24,7 @@ namespace GK_Proj_2
 
         public static double m = 50;
 
-        public static Point3D SunPosition = new Point3D(350, -210, 200);
+        public static Point3D SunPosition = new Point3D(0, 0, 300);
 
         public static int controlEdgeWidth = 2;
 
@@ -38,14 +38,24 @@ namespace GK_Proj_2
 
         public static double SunSpiralRadius = 300.0;
 
-        public static double SunSpiralHeight = 500.0;
+        public static double SunSpiralHeight = 300.0;
 
         public static double SunSpiralCycleSpeed = 4.0;
 
         public static double SunAngle = 0;
 
+        public static bool OwnNormals = false;
+
         public static bool OwnTexture = false;
 
         public static BitmapSource? normalMap = null;
+
+        public static byte[,,]? normalMapTable = null;
+
+        public static BitmapSource? textureMap = null;
+
+        public static byte[,,]? textureMapTable = null;
+
+        public static readonly object bitmapLock = new object();
     }
 }

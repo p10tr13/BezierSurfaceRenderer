@@ -7,6 +7,8 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
+using System.Drawing;
+using FastBitmapLib;
 
 namespace GK_Proj_2
 {
@@ -150,7 +152,7 @@ namespace GK_Proj_2
         //    }
         //}
 
-        public Color CalculateColorWithZoom(int x, int y, int zoom)
+        public System.Windows.Media.Color CalculateColorWithZoom(int x, int y, int zoom)
         {
             double r = (double)Var.TriangleRColor;
             double g = (double)Var.TriangleGColor;
@@ -248,10 +250,10 @@ namespace GK_Proj_2
             kg = Math.Min(kg, 255);
             kb = Math.Min(kb, 255);
 
-            return Color.FromRgb((byte)kr, (byte)kg, (byte)kb);
+            return System.Windows.Media.Color.FromRgb((byte)kr, (byte)kg, (byte)kb);
         }
 
-        public void Fill(WriteableBitmap bitmap)
+        public void Fill(Bitmap bitmap)
         {
             int minY = (int)Math.Min(Math.Min(v1.pointAfter.Y, v2.pointAfter.Y), v3.pointAfter.Y);
             int maxY = (int)Math.Max(Math.Max(v1.pointAfter.Y, v2.pointAfter.Y), v3.pointAfter.Y);
@@ -272,7 +274,7 @@ namespace GK_Proj_2
             {
                 if (ET.ContainsKey(y))
                 {
-                    if(ET.TryGetValue(y,out var list))
+                    if (ET.TryGetValue(y, out var list))
                     {
                         AET.AddRange(list);
                         AET.RemoveAll(e => (int)e.ymax <= y);
@@ -320,7 +322,7 @@ namespace GK_Proj_2
             }
         }
 
-        public Color CalculateColor(int x, int y)
+        public System.Drawing.Color CalculateColor(int x, int y)
         {
             double r = (double)Var.TriangleRColor;
             double g = (double)Var.TriangleGColor;
@@ -361,44 +363,60 @@ namespace GK_Proj_2
             Vector3D intN = new Vector3D(nx, ny, nz);
             intN.Normalize();
 
-            if (Var.OwnTexture && Var.normalMap != null)
+            if (Var.OwnTexture && Var.textureMap !=  null && Var.textureMapTable != null)
             {
                 // Nowe u i v
                 double u = alpha * v1.U + beta * v2.U + gamma * v3.U;
                 double v = alpha * v1.V + beta * v2.V + gamma * v3.V;
+
+                int xp = (int)(v * (Var.textureMap.PixelWidth - 1));
+                int yp = (int)(u * (Var.textureMap.PixelHeight - 1));
+
+                xp = Math.Clamp(xp, 0, Var.textureMap.PixelWidth - 1);
+                yp = Math.Clamp(yp, 0, Var.textureMap.PixelHeight - 1);
+
+                r = Var.textureMapTable[xp, yp, 2];
+                g = Var.textureMapTable[xp, yp, 1];
+                b = Var.textureMapTable[xp, yp, 0];
+            }
+
+            if (Var.OwnNormals && Var.normalMap != null && Var.normalMapTable != null)
+            {
+                // Nowe u i v
+                double u = alpha * v1.U + beta * v2.U + gamma * v3.U;
+                double v = alpha * v1.V + beta * v2.V + gamma * v3.V;
+
                 // Nowe Pu'
                 double pux = alpha * v1.PuVecAfter.X + beta * v2.PuVecAfter.X + gamma * v3.PuVecAfter.X;
                 double puy = alpha * v1.PuVecAfter.Y + beta * v2.PuVecAfter.Y + gamma * v3.PuVecAfter.Y;
                 double puz = alpha * v1.PuVecAfter.Z + beta * v2.PuVecAfter.Z + gamma * v3.PuVecAfter.Z;
+                Vector3D pun = new Vector3D(pux, puy, puz);
+                pun.Normalize();
+
                 // Nowe Pv'
                 double pvx = alpha * v1.PvVecAfter.X + beta * v2.PvVecAfter.X + gamma * v3.PvVecAfter.X;
                 double pvy = alpha * v1.PvVecAfter.Y + beta * v2.PvVecAfter.Y + gamma * v3.PvVecAfter.Y;
                 double pvz = alpha * v1.PvVecAfter.Z + beta * v2.PvVecAfter.Z + gamma * v3.PvVecAfter.Z;
+                Vector3D pvn = new Vector3D(pvx, pvy, pvz);
+                pvn.Normalize();
 
-                int xp = (int)(u * (Var.normalMap.PixelWidth - 1));
-                int yp = (int)(v * (Var.normalMap.PixelHeight - 1));
+                int xp = (int)(v * (Var.normalMap.PixelWidth - 1));
+                int yp = (int)(u * (Var.normalMap.PixelHeight - 1));
 
-                if (xp >= Var.normalMap.PixelWidth)
-                    xp = Var.normalMap.PixelWidth - 1;
-                if (yp >= Var.normalMap.PixelHeight)
-                    yp = Var.normalMap.PixelHeight - 1;
-                if (xp == -1)
-                    xp = 0;
-                if (yp == -1)
-                    yp = 0;
+                xp = Math.Clamp(xp, 0, Var.normalMap.PixelWidth - 1);
+                yp = Math.Clamp(yp, 0, Var.normalMap.PixelHeight - 1);
 
-                byte[] pixels = new byte[4];
-                Var.normalMap.CopyPixels(new Int32Rect(xp, yp, 1, 1), pixels, 4, 0);
-                double npx = (pixels[2] / 255.0) * 2 - 1;
-                double npy = (pixels[1] / 255.0) * 2 - 1;
-                double npz = (pixels[0] / 255.0) * 2 - 1;
+                double npx = (Var.normalMapTable[xp, yp, 2] / 255.0) * 2 - 1;
+                double npy = (Var.normalMapTable[xp, yp, 1] / 255.0) * 2 - 1;
+                double npz = (Var.normalMapTable[xp, yp, 0] / 255.0) * 2 - 1;
+                //npz = Math.Clamp(npz, 0, 1);
 
                 Vector3D pixelV = new Vector3D(npx, npy, npz);
                 pixelV.Normalize();
 
-                Matrix3D Matrix = new Matrix3D(pux, pvx, intN.X, 0,
-                                               puy, pvy, intN.Y, 0,
-                                               puz, pvz, intN.Z, 0,
+                Matrix3D Matrix = new Matrix3D(pun.X, pvn.X, intN.X, 0,
+                                               pun.Y, pvn.Y, intN.Y, 0,
+                                               pun.Z, pvn.Z, intN.Z, 0,
                                                0, 0, 0, 1);
                 intN = Matrix.Transform(pixelV);
                 intN.Normalize();
@@ -413,48 +431,39 @@ namespace GK_Proj_2
             // składowa rozproszona rmodelu oświetlenie bez kolorów
             double rmodel = Var.kd * Math.Max(Vector3D.DotProduct(intN, lightV), 0);
 
-            double kr = r * rl/255 * (zwierciadlana + rmodel);
-            double kg = g * gl/255 * (zwierciadlana + rmodel);
-            double kb = b * bl/255 * (zwierciadlana + rmodel);
+            double kr = r * rl / 255 * (zwierciadlana + rmodel);
+            double kg = g * gl / 255 * (zwierciadlana + rmodel);
+            double kb = b * bl / 255 * (zwierciadlana + rmodel);
 
             kr = Math.Min(kr, 255);
             kg = Math.Min(kg, 255);
             kb = Math.Min(kb, 255);
 
-            return Color.FromRgb((byte)kr, (byte)kg, (byte)kb);
+            return System.Drawing.Color.FromArgb((byte)kr, (byte)kg, (byte)kb);
         }
 
-        public void SetPixel(WriteableBitmap bitmap, int xbefore, int ybefore, Color color)
+        public void SetPixel(Bitmap bitmap, int xbefore, int ybefore, System.Drawing.Color color)
         {
             int scaleX = 1;
             int scaleY = -1;
-            double translateX = bitmap.PixelWidth / 2;
-            double translateY = bitmap.PixelHeight / 2;
 
-            int x = xbefore * scaleX + (int)translateX;
-            int y = ybefore * scaleY + (int)translateY;
-
-
-            if (x < 0 || x >= bitmap.PixelWidth || y < 0 || y >= bitmap.PixelHeight)
-                return;
-
-            bitmap.Lock();
-
-            unsafe
+            lock (Var.bitmapLock)
             {
-                IntPtr pBackBuffer = bitmap.BackBuffer;
-                int stride = bitmap.BackBufferStride;
-                int pixelOffset = y * stride + x * 4;
+                using (var fastBitmap = bitmap.FastLock())
+                {
+                    double translateX = bitmap.Width / 2;
+                    double translateY = bitmap.Height / 2;
 
-                byte* pPixel = (byte*)pBackBuffer + pixelOffset;
-                pPixel[0] = color.B;
-                pPixel[1] = color.G;
-                pPixel[2] = color.R;
-                pPixel[3] = color.A;
-            }
+                    int x = xbefore * scaleX + (int)translateX;
+                    int y = ybefore * scaleY + (int)translateY;
 
-            bitmap.AddDirtyRect(new Int32Rect(x, y, 1, 1));
-            bitmap.Unlock();
+
+                    if (x < 0 || x >= bitmap.Width || y < 0 || y >= bitmap.Height)
+                        return;
+
+                    fastBitmap.SetPixel(x, y, color);
+                }
+            }   
         }
     }
 }
