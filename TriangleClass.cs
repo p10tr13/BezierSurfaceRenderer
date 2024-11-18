@@ -253,6 +253,7 @@ namespace GK_Proj_2
             return System.Windows.Media.Color.FromRgb((byte)kr, (byte)kg, (byte)kb);
         }
 
+        // Funkcja wypełniania tego trójkąta z sortowaniem kubełkowym
         public void Fill(Bitmap bitmap)
         {
             int minY = (int)Math.Min(Math.Min(v1.pointAfter.Y, v2.pointAfter.Y), v3.pointAfter.Y);
@@ -322,6 +323,7 @@ namespace GK_Proj_2
             }
         }
 
+        // Funkcja oblicza odpowiedni kolor dla danego położenia piksela (x,y)
         public System.Drawing.Color CalculateColor(int x, int y)
         {
             double r = (double)Var.TriangleRColor;

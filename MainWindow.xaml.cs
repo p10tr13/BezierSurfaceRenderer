@@ -25,6 +25,38 @@ namespace GK_Proj_2
         public MainWindow()
         {
             InitializeComponent();
+            // Wczytanie przykładowych map
+            string basePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
+
+            string surfaceMapPath = System.IO.Path.Combine(basePath, "Surfaces/111.txt");
+            Point3D[,] controlPoints = new Point3D[4, 4];
+            using StreamReader reader = new StreamReader(surfaceMapPath);
+            string line = reader.ReadLine();
+            for (int i = 0; i < 16; i++)
+            {
+                string[] cords = line.Split(" ");
+                double x, y, z;
+                if (double.TryParse(cords[0], out x) && double.TryParse(cords[1], out y) && double.TryParse(cords[2], out z))
+                {
+                    int j = i % 4;
+                    controlPoints[(i - j) / 4, j] = new Point3D(x, y, z);
+                }
+                else
+                    throw new Exception();
+
+                line = reader.ReadLine();
+            }
+            bezierSurface = new BezierSurface(controlPoints, (int)PrecisionSlider.Value);
+            reader.Close();
+            Draw();
+
+            string normalMapPath = System.IO.Path.Combine(basePath, "NormalMaps/Sci-Fi_Wall_015_normal.png");
+            Var.normalMap = new BitmapImage(new Uri(normalMapPath, UriKind.RelativeOrAbsolute));
+            FillNormalsMapTable();
+
+            string baseColorMapPath = System.IO.Path.Combine(basePath, "TextureMaps/Sci-Fi_Wall_015_basecolor.png");
+            Var.textureMap = new BitmapImage(new Uri(baseColorMapPath, UriKind.Relative));
+            FillTextureMapTable();
         }
 
         private void FileButton_Click(object sender, RoutedEventArgs e)
@@ -171,8 +203,8 @@ namespace GK_Proj_2
                     MyCanvas.Children.Add(rect);
                     p++;
                 }
-                
-                
+
+
                 while (e != edgeList.Count && tri.MeanZ >= edgeList[e].MeanZ)
                 {
                     Line line = new Line
@@ -212,7 +244,7 @@ namespace GK_Proj_2
                 MyCanvas.Children.Add(rect);
                 p++;
             }
-            
+
             while (e != edgeList.Count)
             {
                 Line line = new Line
@@ -229,6 +261,7 @@ namespace GK_Proj_2
             }
         }
 
+        // Rysowanie wypełnienia trójkątów
         private void DrawFill()
         {
             MyCanvas.Children.Clear();
@@ -247,10 +280,12 @@ namespace GK_Proj_2
             for (int i = 0; i < bezierSurface.Triangles.Count; i++)
             {
                 Triangle tri = bezierSurface.Triangles[i];
-            
+
                 tri.Fill(bitmap);
             }
 
+            // Za dużo jest zmiennych dzielonych, które można by niby przekazać w wywołaniu funckji,
+            // ale zyski w wydajności nie były na tyle duże, aby był sens tak robić (według mnie).
             //Parallel.ForEach(bezierSurface.Triangles, tri =>
             //{
             //    tri.Fill(bitmap);
@@ -263,13 +298,13 @@ namespace GK_Proj_2
             image.RenderTransform = new ScaleTransform(1, -1);
             MyCanvas.Children.Add(image);
 
-            // Elipsa ukazująca pozycje światła dla sprawdzenia czy ok świeci
+            // Elipsa ukazująca pozycje światła dla sprawdzenia, czy ok świeci
             Ellipse sun = new Ellipse();
             sun.Stroke = System.Windows.Media.Brushes.Green;
             sun.Width = 10;
             sun.Height = 10;
-            Canvas.SetLeft(sun,Var.SunPosition.X - 5);
-            Canvas.SetTop(sun,Var.SunPosition.Y - 5);
+            Canvas.SetLeft(sun, Var.SunPosition.X - 5);
+            Canvas.SetTop(sun, Var.SunPosition.Y - 5);
             MyCanvas.Children.Add(sun);
         }
 
@@ -315,7 +350,7 @@ namespace GK_Proj_2
         private void GridRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             Var.GridDrawingMode = true;
-            if (timer !=  null)
+            if (timer != null)
                 timer.Stop();
             Draw();
         }
@@ -361,10 +396,10 @@ namespace GK_Proj_2
             timer.Start();
         }
 
-        private void StopSunAnimation(object sender, RoutedEventArgs e) 
-        { 
-            if(timer != null)
-                timer.Stop(); 
+        private void StopSunAnimation(object sender, RoutedEventArgs e)
+        {
+            if (timer != null)
+                timer.Stop();
         }
 
         private void zSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -391,24 +426,31 @@ namespace GK_Proj_2
                 try
                 {
                     Var.normalMap = new BitmapImage(new Uri(filename, UriKind.RelativeOrAbsolute));
-
-                    Var.normalMapTable = new byte[Var.normalMap.PixelWidth, Var.normalMap.PixelHeight, 3];
-
-                    for (int i = 0; i < Var.normalMap.PixelWidth; i++)
-                    {
-                        for (int j = 0; j < Var.normalMap.PixelHeight; j++)
-                        {
-                            byte[] pixels = new byte[4];
-                            Var.normalMap.CopyPixels(new Int32Rect(i, j, 1, 1), pixels, 4, 0);
-                            Var.normalMapTable[i, j, 0] = pixels[0];
-                            Var.normalMapTable[i, j, 1] = pixels[1];
-                            Var.normalMapTable[i, j, 2] = pixels[2];
-                        }
-                    }
+                    FillNormalsMapTable();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void FillNormalsMapTable()
+        {
+            if (Var.normalMap == null)
+                return;
+
+            Var.normalMapTable = new byte[Var.normalMap.PixelWidth, Var.normalMap.PixelHeight, 3];
+
+            for (int i = 0; i < Var.normalMap.PixelWidth; i++)
+            {
+                for (int j = 0; j < Var.normalMap.PixelHeight; j++)
+                {
+                    byte[] pixels = new byte[4];
+                    Var.normalMap.CopyPixels(new Int32Rect(i, j, 1, 1), pixels, 4, 0);
+                    Var.normalMapTable[i, j, 0] = pixels[0];
+                    Var.normalMapTable[i, j, 1] = pixels[1];
+                    Var.normalMapTable[i, j, 2] = pixels[2];
                 }
             }
         }
@@ -445,24 +487,31 @@ namespace GK_Proj_2
                 try
                 {
                     Var.textureMap = new BitmapImage(new Uri(filename, UriKind.RelativeOrAbsolute));
-
-                    Var.textureMapTable = new byte[Var.textureMap.PixelWidth, Var.textureMap.PixelHeight, 3];
-
-                    for (int i = 0; i < Var.textureMap.PixelWidth; i++)
-                    {
-                        for (int j = 0; j < Var.textureMap.PixelHeight; j++)
-                        {
-                            byte[] pixels = new byte[4];
-                            Var.textureMap.CopyPixels(new Int32Rect(i, j, 1, 1), pixels, 4, 0);
-                            Var.textureMapTable[i, j, 0] = pixels[0];
-                            Var.textureMapTable[i, j, 1] = pixels[1];
-                            Var.textureMapTable[i, j, 2] = pixels[2];
-                        }
-                    }
+                    FillTextureMapTable();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void FillTextureMapTable()
+        {
+            if (Var.textureMap == null)
+                return;
+
+            Var.textureMapTable = new byte[Var.textureMap.PixelWidth, Var.textureMap.PixelHeight, 3];
+
+            for (int i = 0; i < Var.textureMap.PixelWidth; i++)
+            {
+                for (int j = 0; j < Var.textureMap.PixelHeight; j++)
+                {
+                    byte[] pixels = new byte[4];
+                    Var.textureMap.CopyPixels(new Int32Rect(i, j, 1, 1), pixels, 4, 0);
+                    Var.textureMapTable[i, j, 0] = pixels[0];
+                    Var.textureMapTable[i, j, 1] = pixels[1];
+                    Var.textureMapTable[i, j, 2] = pixels[2];
                 }
             }
         }
