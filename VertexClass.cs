@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
-using System.Numerics;
+﻿using System.Windows.Media.Media3D;
 
 namespace GK_Proj_2
 {
@@ -16,7 +10,7 @@ namespace GK_Proj_2
 
         public Vector3D PvVec { get; set; }
 
-        public Vector3D N => Vector3D.CrossProduct(PuVec, PvVec); // Jeszcze nie znormalizowany
+        public Vector3D N => Vector3D.CrossProduct(PuVec, PvVec); // Not normalized yet
 
         public Point3D pointAfter { get; set; }
 
@@ -24,7 +18,7 @@ namespace GK_Proj_2
 
         public Vector3D PvVecAfter { get; set; }
 
-        public Vector3D NAfter => Vector3D.CrossProduct(PuVecAfter, PvVecAfter); // Jeszcze nie znormalizowany
+        public Vector3D NAfter => Vector3D.CrossProduct(PuVecAfter, PvVecAfter); // Not normalized yet
 
         public double U { get; set; }
 

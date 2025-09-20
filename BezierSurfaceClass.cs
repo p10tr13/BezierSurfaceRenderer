@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Security.Cryptography.Pkcs;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
+﻿using System.Windows.Media.Media3D;
 
 namespace GK_Proj_2
 {

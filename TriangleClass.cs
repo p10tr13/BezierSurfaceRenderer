@@ -1,11 +1,4 @@
-﻿using System.Runtime.Intrinsics;
-using System.Windows.Controls;
-using System.Linq;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using System.Windows.Media.Imaging;
+﻿using System.Windows;
 using System.Windows.Media.Media3D;
 using System.Drawing;
 using FastBitmapLib;
@@ -27,8 +20,8 @@ namespace GK_Proj_2
             this.v3 = v3;
         }
 
-        // Ta fukcja pozwala na rysowanie na Canvie bitmap każdego trójkąta oddzielnie i można przez to uzyskać efekt odpowiedniej kolejności z
-        // punktami kontrolnymi i krawędziami, ale jest wolniejsze i trzeba trochę przerobić więc nie używam jej
+        // This function allows you to draw each triangle separately on the canvas as a bitmap, which gives you the effect of the correct order with
+        // control points and edges, but it is slower and requires some reworking, so its not in use.
         //public void FillOnCanva(Canvas canvas, int zoom)
         //{
         //    int width = (int)canvas.ActualWidth;
@@ -172,7 +165,7 @@ namespace GK_Proj_2
             n2.Normalize();
             n3.Normalize();
 
-            // Wartości barycentryczne do dalszych obliczeń
+            // Barycentric values for further calculations
             double denom = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
             double alpha = ((y2 - y3) * (x / zoom - x3) + (x3 - x2) * (y / zoom - y3)) / denom;
             double beta = ((y3 - y1) * (x / zoom - x3) + (x1 - x3) * (y / zoom - y3)) / denom;
@@ -181,11 +174,11 @@ namespace GK_Proj_2
             double z = alpha * z1 + beta * z2 + gamma * z3;
             Point3D pixPos = new Point3D(x / zoom, y / zoom, z);
 
-            // Wektor do źródła światła
+            // Vector to light source
             Vector3D lightV = Var.SunPosition - pixPos;
             lightV.Normalize();
 
-            // Interpolowanie wektora normalnego
+            // Interpolating the normal vector
             double nx = alpha * n1.X + beta * n2.X + gamma * n3.X;
             double ny = alpha * n1.Y + beta * n2.Y + gamma * n3.Y;
             double nz = alpha * n1.Z + beta * n2.Z + gamma * n3.Z;
@@ -195,14 +188,14 @@ namespace GK_Proj_2
 
             if (Var.OwnTexture && Var.normalMap != null)
             {
-                // Nowe u i v
+                // New u and v
                 double u = alpha * v1.U + beta * v2.U + gamma * v3.U;
                 double v = alpha * v1.V + beta * v2.V + gamma * v3.V;
-                // Nowe Pu'
+                // New Pu'
                 double pux = alpha * v1.PuVecAfter.X + beta * v2.PuVecAfter.X + gamma * v3.PuVecAfter.X;
                 double puy = alpha * v1.PuVecAfter.Y + beta * v2.PuVecAfter.Y + gamma * v3.PuVecAfter.Y;
                 double puz = alpha * v1.PuVecAfter.Z + beta * v2.PuVecAfter.Z + gamma * v3.PuVecAfter.Z;
-                // Nowe Pv'
+                // New Pv'
                 double pvx = alpha * v1.PvVecAfter.X + beta * v2.PvVecAfter.X + gamma * v3.PvVecAfter.X;
                 double pvy = alpha * v1.PvVecAfter.Y + beta * v2.PvVecAfter.Y + gamma * v3.PvVecAfter.Y;
                 double pvz = alpha * v1.PvVecAfter.Z + beta * v2.PvVecAfter.Z + gamma * v3.PvVecAfter.Z;
@@ -235,16 +228,16 @@ namespace GK_Proj_2
             Vector3D reflectionV = 2 * Vector3D.DotProduct(intN, lightV) * intN - lightV;
             reflectionV.Normalize();
 
-            // składowa zwierciadlana bez uwzględniania kolorów
-            double zwierciadlana = Var.ks * Math.Pow(Math.Max(Vector3D.DotProduct(reflectionV, V), 0), Var.m);
+            // shininess component without taking colors into account
+            double shininess = Var.ks * Math.Pow(Math.Max(Vector3D.DotProduct(reflectionV, V), 0), Var.m);
 
-            // składowa rozproszona rmodelu oświetlenie bez kolorów
+            // diffuse component without taking colors into account
             double cos = Vector3D.DotProduct(intN, lightV);
             double rmodel = Var.kd * Math.Max(Vector3D.DotProduct(intN, lightV), 0);
 
-            double kr = r * rl * (zwierciadlana + rmodel);
-            double kg = g * gl * (zwierciadlana + rmodel);
-            double kb = b * bl * (zwierciadlana + rmodel);
+            double kr = r * rl * (shininess + rmodel);
+            double kg = g * gl * (shininess + rmodel);
+            double kb = b * bl * (shininess + rmodel);
 
             kr = Math.Min(kr, 255);
             kg = Math.Min(kg, 255);
@@ -253,7 +246,7 @@ namespace GK_Proj_2
             return System.Windows.Media.Color.FromRgb((byte)kr, (byte)kg, (byte)kb);
         }
 
-        // Funkcja wypełniania tego trójkąta z sortowaniem kubełkowym
+        // Function of filling this triangle with bucket sorting
         public void Fill(Bitmap bitmap)
         {
             int minY = (int)Math.Min(Math.Min(v1.pointAfter.Y, v2.pointAfter.Y), v3.pointAfter.Y);
@@ -323,7 +316,7 @@ namespace GK_Proj_2
             }
         }
 
-        // Funkcja oblicza odpowiedni kolor dla danego położenia piksela (x,y)
+        // The function calculates the appropriate color for a given pixel position (x,y)
         public System.Drawing.Color CalculateColor(int x, int y)
         {
             double r = (double)Var.TriangleRColor;
@@ -344,7 +337,7 @@ namespace GK_Proj_2
             n2.Normalize();
             n3.Normalize();
 
-            // Wartości barycentryczne do dalszych obliczeń
+            // Barycentric values for further calculations
             double denom = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
             double alpha = ((y2 - y3) * (x - x3) + (x3 - x2) * (y - y3)) / denom;
             double beta = ((y3 - y1) * (x - x3) + (x1 - x3) * (y - y3)) / denom;
@@ -353,11 +346,11 @@ namespace GK_Proj_2
             double z = alpha * z1 + beta * z2 + gamma * z3;
             Point3D pixPos = new Point3D(x, y, z);
 
-            // Wektor do źródła światła
+            // Vector to light source
             Vector3D lightV = Var.SunPosition - pixPos;
             lightV.Normalize();
 
-            // Interpolowanie wektora normalnego
+            // Interpolating the normal vector
             double nx = alpha * n1.X + beta * n2.X + gamma * n3.X;
             double ny = alpha * n1.Y + beta * n2.Y + gamma * n3.Y;
             double nz = alpha * n1.Z + beta * n2.Z + gamma * n3.Z;
@@ -427,15 +420,15 @@ namespace GK_Proj_2
             Vector3D reflectionV = 2 * Vector3D.DotProduct(intN, lightV) * intN - lightV;
             reflectionV.Normalize();
 
-            // składowa zwierciadlana bez uwzględniania kolorów
-            double zwierciadlana = Var.ks * Math.Pow(Math.Max(Vector3D.DotProduct(reflectionV, V), 0), Var.m);
+            // shininess component without taking colors into account
+            double shininess = Var.ks * Math.Pow(Math.Max(Vector3D.DotProduct(reflectionV, V), 0), Var.m);
 
-            // składowa rozproszona rmodelu oświetlenie bez kolorów
+            // diffuse component without taking colors into account
             double rmodel = Var.kd * Math.Max(Vector3D.DotProduct(intN, lightV), 0);
 
-            double kr = r * rl / 255 * (zwierciadlana + rmodel);
-            double kg = g * gl / 255 * (zwierciadlana + rmodel);
-            double kb = b * bl / 255 * (zwierciadlana + rmodel);
+            double kr = r * rl / 255 * (shininess + rmodel);
+            double kg = g * gl / 255 * (shininess + rmodel);
+            double kb = b * bl / 255 * (shininess + rmodel);
 
             kr = Math.Min(kr, 255);
             kg = Math.Min(kg, 255);
