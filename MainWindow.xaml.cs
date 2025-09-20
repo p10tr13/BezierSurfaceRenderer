@@ -25,7 +25,7 @@ namespace GK_Proj_2
         public MainWindow()
         {
             InitializeComponent();
-            // Wczytanie przykładowych map
+            // Loading sample maps
             string basePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", ".."));
 
             string surfaceMapPath = System.IO.Path.Combine(basePath, "Surfaces/111.txt");
@@ -95,7 +95,7 @@ namespace GK_Proj_2
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("An error occurred while reading the file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -146,8 +146,8 @@ namespace GK_Proj_2
             Draw();
         }
 
-        // Rysowanie siatki z efektem głębi (sortowanie po współrzędnej z podczas obortu beta)
-        // Aby zobaczyć efekt można włączyć proste wypełnianie trójkątów przy rysowaniu Polygon w tej funkcji
+        // Drawing a grid with depth effect (sorting by z-coordinate during beta rotation)
+        // To see the effect, you can enable simple triangle filling when drawing Polygon in this function
         private void DrawGrid()
         {
             MyCanvas.Children.Clear();
@@ -159,12 +159,12 @@ namespace GK_Proj_2
 
             Point3D[,] points = bezierSurface.GetRotatedControlPoints((int)AlphaSlider.Value, (int)BetaSlider.Value);
 
-            // Stworzenie posortowanej listy punktów kontrolnych
+            // Creating a sorted list of control points by z-coordinate
             List<Point3D> pointList = [.. points];
             pointList = pointList.OrderBy(point => point.Z).ToList();
             int p = 0;
 
-            // Stworzenie posortowanej listy połączeń pomiędzy punktami kontrolnymi
+            // Creating a sorted list of edges by mean z-coordinate
             List<(double MeanZ, double x1, double y1, double x2, double y2)> edgeList = [];
             for (int i = 0; i < points.GetLength(0); i++)
             {
@@ -261,7 +261,7 @@ namespace GK_Proj_2
             }
         }
 
-        // Rysowanie wypełnienia trójkątów
+        // Drawing triangle fills
         private void DrawFill()
         {
             MyCanvas.Children.Clear();
@@ -284,8 +284,8 @@ namespace GK_Proj_2
                 tri.Fill(bitmap);
             }
 
-            // Za dużo jest zmiennych dzielonych, które można by niby przekazać w wywołaniu funckji,
-            // ale zyski w wydajności nie były na tyle duże, aby był sens tak robić (według mnie).
+            // There are too many shared variables that could be passed in a function call,
+            // but the performance gains were not significant enough to make it worthwhile.
             //Parallel.ForEach(bezierSurface.Triangles, tri =>
             //{
             //    tri.Fill(bitmap);
@@ -298,7 +298,7 @@ namespace GK_Proj_2
             image.RenderTransform = new ScaleTransform(1, -1);
             MyCanvas.Children.Add(image);
 
-            // Elipsa ukazująca pozycje światła dla sprawdzenia, czy ok świeci
+            // Ellipse showing the positions of light
             Ellipse sun = new Ellipse();
             sun.Stroke = System.Windows.Media.Brushes.Green;
             sun.Width = 10;
@@ -326,7 +326,7 @@ namespace GK_Proj_2
                 Draw();
             }
             else
-                MessageBox.Show("Złe kolory", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Incorrect input.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void kdSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -372,7 +372,7 @@ namespace GK_Proj_2
                 Draw();
             }
             else
-                MessageBox.Show("Złe kolory", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Incorrect input.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void UpdateSunPosition(object sender, EventArgs e)
@@ -430,7 +430,7 @@ namespace GK_Proj_2
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("An error occurred while reading the file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -464,7 +464,7 @@ namespace GK_Proj_2
             }
             else
             {
-                MessageBox.Show("Brak mapy wektorów normalnych", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No normal vector map.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 TextureCheckBox.IsChecked = false;
             }
         }
@@ -491,7 +491,7 @@ namespace GK_Proj_2
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Wystąpił błąd podczas czytania pliku", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("An error occurred while reading the file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
@@ -525,7 +525,7 @@ namespace GK_Proj_2
             }
             else
             {
-                MessageBox.Show("Brak mapy wektorów normalnych", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("No color map", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 TextureCheckBox.IsChecked = false;
             }
         }
